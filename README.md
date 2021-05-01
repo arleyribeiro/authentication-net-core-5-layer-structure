@@ -1,6 +1,6 @@
 # Authentication with .Net Core 5
 
-This is a simple project to authenticate a user separated by project layers and responsibilities.
+This is a simple project to authenticate an user separated by project layers and responsibilities.
 
 ## Features
 
