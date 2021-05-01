@@ -16,6 +16,11 @@ This is a simple project to authenticate an user separated by project layers and
 - JWT
 - BCrypt
 
+## Patterns
+
+- Repository
+- Inversion of control
+
 ## Folders structure
 
 - Authentication - (webapi project)
