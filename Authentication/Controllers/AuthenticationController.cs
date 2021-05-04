@@ -38,8 +38,7 @@ namespace Authentication.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<bool>> Register([FromBody] RegisterRequest user)
         {
-            var _user = new User { Username = user.Username, Password = user.Password, Role = user.Role };
-            var result = await _accountService.Register(_user).ConfigureAwait(false);
+            var result = await _accountService.Register(user).ConfigureAwait(false);
             return result;
         }
     }

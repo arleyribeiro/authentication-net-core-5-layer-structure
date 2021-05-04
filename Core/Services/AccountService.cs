@@ -1,9 +1,9 @@
+using AutoMapper;
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
 using Core.Validators;
 using Domain.Entities;
-//using FluentValidation;
-//using FluentValidation.AspNetCore;
+using Domain.DTOs.Request;
 using Infrastructure.Interfaces.Repositories;
 
 using System;
@@ -17,8 +17,10 @@ namespace Core.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenService _tokenService;
-        public AccountService(IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenService tokenService) : base(userRepository)
+        private readonly IMapper _mapper;
+        public AccountService(IMapper mapper, IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenService tokenService) : base(userRepository)
         {
+            _mapper = mapper;
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;
@@ -39,14 +41,20 @@ namespace Core.Services
             return _passwordHasher.VerifyHashedPassword(hashedPassword, password);
         }
 
-        public async Task<bool> Register(User user)
+        public async Task<bool> Register(RegisterRequest register)
         {
-            if (user == null)
-                return false;
+            ValidateRegisterRequest(register);
+            var user = _mapper.Map<User>(register);
+            return await Insert(user).ConfigureAwait(false);
+        }
 
+        private void ValidateRegisterRequest(RegisterRequest register)
+        {
+            if (register == null)
+                throw new ArgumentException("Required register");
 
-            var validator = new UserValidator();
-            var results = validator.Validate(user);
+            var validator = new RegisterValidator();
+            var results = validator.Validate(register);
 
             if (!results.IsValid)
             {
@@ -57,8 +65,6 @@ namespace Core.Services
                 }
                 throw new ArgumentException(String.Join("/n", errors));
             }
-
-            return await Insert(user).ConfigureAwait(false);
         }
 
         private async Task<bool> Insert(User user)
