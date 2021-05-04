@@ -1,6 +1,9 @@
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
+using Core.Validators;
 using Domain.Entities;
+//using FluentValidation;
+//using FluentValidation.AspNetCore;
 using Infrastructure.Interfaces.Repositories;
 
 using System;
@@ -41,9 +44,18 @@ namespace Core.Services
             if (user == null)
                 return false;
 
-            if (string.IsNullOrEmpty(user.Role?.Trim()) || (string.Compare(user.Role, "manager", true) > 0 && string.Compare(user.Role, "employee", true) > 0))
+
+            var validator = new UserValidator();
+            var results = validator.Validate(user);
+
+            if (!results.IsValid)
             {
-                throw new ArgumentException("ROLE: Must be manager or employee");
+                var errors = new List<string>();
+                foreach (var item in results.Errors)
+                {
+                    errors.Add(item.ErrorMessage);
+                }
+                throw new ArgumentException(String.Join("/n", errors));
             }
 
             return await Insert(user).ConfigureAwait(false);

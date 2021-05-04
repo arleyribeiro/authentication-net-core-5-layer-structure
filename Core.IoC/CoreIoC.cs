@@ -2,8 +2,10 @@
 using Core.Interfaces.Services;
 using Core.Security;
 using Core.Services;
+using Core.Validators;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using FluentValidation.AspNetCore;
 
 namespace Core.IoC
 {
@@ -15,6 +17,7 @@ namespace Core.IoC
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPasswordHasher, BCryptPasswordHahser>();
+            services.AddMvc().AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<UserValidator>());
         }
 
     }
