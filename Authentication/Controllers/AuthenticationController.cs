@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 using Core.Interfaces.Services;
 using Domain.DTOs.Request;
+using Domain.DTOs.Response;
 using Domain.Entities;
 
 namespace Authentication.Controllers
@@ -24,13 +25,9 @@ namespace Authentication.Controllers
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<dynamic>> Login([FromBody] AuthenticateRequest model)
+        public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest model)
         {
-            var token = await _accountService.Login(model.Username, model.Password);
-            return new
-            {
-                token = token
-            };
+            return await _accountService.Login(model).ConfigureAwait(false);
         }
 
         [HttpPost]
@@ -38,8 +35,7 @@ namespace Authentication.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<bool>> Register([FromBody] RegisterRequest user)
         {
-            var result = await _accountService.Register(user).ConfigureAwait(false);
-            return result;
+            return await _accountService.Register(user).ConfigureAwait(false);
         }
     }
 }

@@ -4,6 +4,7 @@ using Core.Interfaces.Services;
 using Core.Validators;
 using Domain.Entities;
 using Domain.DTOs.Request;
+using Domain.DTOs.Response;
 using Infrastructure.Interfaces.Repositories;
 
 using System;
@@ -26,13 +27,13 @@ namespace Core.Services
             _tokenService = tokenService;
         }
 
-        public async Task<string> Login(string username, string password)
+        public async Task<LoginResponse> Login(LoginRequest login)
         {
-            var account = await _userRepository.GetUserAsync(username).ConfigureAwait(false);
-            if (account != null && Authenticate(account.Password, password))
+            var account = await _userRepository.GetUserAsync(login.Username).ConfigureAwait(false);
+            if (account != null && Authenticate(account.Password, login.Password))
             {
                 var token = _tokenService.GenerateToken(account);
-                return token;
+                return new LoginResponse { Token = token };
             }
             return null;
         }
