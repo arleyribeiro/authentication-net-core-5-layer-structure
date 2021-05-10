@@ -5,6 +5,7 @@ using Core.Validators;
 using Domain.Entities;
 using Domain.DTOs.Request;
 using Domain.DTOs.Response;
+using Core.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 
 using System;
@@ -52,19 +53,26 @@ namespace Core.Services
         private void ValidateRegisterRequest(RegisterRequest register)
         {
             if (register == null)
-                throw new ArgumentException("Required register");
+                throw new BusinessException("Required register");
 
             var validator = new RegisterValidator();
             var results = validator.Validate(register);
 
             if (!results.IsValid)
             {
-                var errors = new List<string>();
+                var errors = new List<int>();
                 foreach (var item in results.Errors)
                 {
-                    errors.Add(item.ErrorMessage);
+                    try
+                    {
+                        errors.Add(Convert.ToInt32(item.ErrorMessage));
+                    }
+                    catch
+                    {
+
+                    }
                 }
-                throw new ArgumentException(String.Join("/n", errors));
+                throw new BusinessException(errors);
             }
         }
 

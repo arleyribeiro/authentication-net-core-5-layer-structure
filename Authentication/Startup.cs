@@ -18,6 +18,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Infrastructure.IoC;
 using Core.IoC;
+using Authentication.Middlewares;
+using Authentication.Filter;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Authentication
 {
@@ -34,12 +37,20 @@ namespace Authentication
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers(options => options.EnableEndpointRouting = false);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Authentication", Version = "v1" });
             });
 
+
+            SecurityConfiguration(services);
+            services.InfrastructureServiceIoc();
+            services.CoreServiceIoc();
+        }
+
+        private void SecurityConfiguration(IServiceCollection services)
+        {
             var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("SecretKey"));
             services.AddAuthentication(x =>
             {
@@ -59,8 +70,10 @@ namespace Authentication
                 };
             });
 
-            services.InfrastructureServiceIoc();
-            services.CoreServiceIoc();
+            services.AddMvc(config =>
+            {
+                config.Filters.Add(typeof(ExceptionFilter));
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -89,6 +102,9 @@ namespace Authentication
             {
                 endpoints.MapControllers();
             });
+
+            app.UseMiddleware(typeof(GlobalErrorHandler));
+            app.UseMvc();
         }
     }
 }
