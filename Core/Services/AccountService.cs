@@ -37,7 +37,7 @@ namespace Core.Services
                 var token = _tokenService.GenerateToken(account);
                 return new LoginResponse { Token = token };
             }
-            return null;
+            throw new BusinessException(ErrorsConstants.INVALID_LOGIN);
         }
         public bool Authenticate(string hashedPassword, string password)
         {
@@ -55,7 +55,7 @@ namespace Core.Services
         {
             if (register == null)
             {
-                throw new BusinessException(ErrorsConstants.REQUIRED_PARAMETER);
+                throw new ArgumentBusinessException(ErrorsConstants.REQUIRED_PARAMETER);
             }
             RegisterValidator.ValidateAndThrowExceptionIfExistError(register);
         }
@@ -66,12 +66,11 @@ namespace Core.Services
             {
                 user.Password = _passwordHasher.HashPassword(user.Password);
                 var id = await _userRepository.Insert(user).ConfigureAwait(false);
-                return id > 0;
+                return id > 0 ? true : throw new BusinessException(ErrorsConstants.Register.LOGIN_REGISTRATION_FAILED);
             }
             catch (Exception)
             {
-                // handle error
-                return false;
+                throw new BusinessException(ErrorsConstants.Register.LOGIN_REGISTRATION_FAILED);
             }
         }
     }

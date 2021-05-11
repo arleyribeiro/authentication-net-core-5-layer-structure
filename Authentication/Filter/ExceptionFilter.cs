@@ -1,3 +1,4 @@
+using System.Net;
 using AutoMapper;
 using Domain.Constants;
 using Domain.Errors;
@@ -44,6 +45,9 @@ namespace Authentication.Filter
                 case AutoMapperMappingException mappingException:
                     return ExceptionHandler(mappingException.InnerException);
 
+                case ArgumentBusinessException argumentBusinessException:
+                    return GetResponseFromErrorMessage(argumentBusinessException.Errors, HttpStatusCode.BadRequest);
+
                 case BusinessException businessException:
                     return GetResponseFromErrorMessage(businessException.Errors);
 
@@ -52,19 +56,19 @@ namespace Authentication.Filter
             }
         }
 
-        private IActionResult GetResponseFromErrorMessage(Error error)
+        private IActionResult GetResponseFromErrorMessage(Error error, HttpStatusCode statusCode = HttpStatusCode.InternalServerError)
         {
             return new ObjectResult(new { errors = new List<Error> { error } })
             {
-                StatusCode = (int)error.StatusCode
+                StatusCode = (int)statusCode
             };
         }
 
-        private IActionResult GetResponseFromErrorMessage(IEnumerable<Error> errors)
+        private IActionResult GetResponseFromErrorMessage(IEnumerable<Error> errors, HttpStatusCode statusCode = HttpStatusCode.InternalServerError)
         {
             return new ObjectResult(new { errors })
             {
-                StatusCode = 400
+                StatusCode = (int)statusCode
             };
         }
     }

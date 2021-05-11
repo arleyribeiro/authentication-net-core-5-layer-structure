@@ -10,6 +10,8 @@ namespace Domain.Constants
         public const int UPDATED_AT_INVALID = 304;
         public const int FUTURE_UPDATED_AT_INVALID = 305;
 
+        public const int INVALID_LOGIN = 400;
+
         public static class Register
         {
             public const int MIN_LENGTH_PASSWORD = 1000;
@@ -17,6 +19,8 @@ namespace Domain.Constants
             public const int MIN_LENGTH_USERNAME = 1002;
             public const int MAX_LENGTH_USERNAME = 1003;
             public const int INVALID_ROLE = 1004;
+
+            public const int LOGIN_REGISTRATION_FAILED = 1005;
         }
     }
 }

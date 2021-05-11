@@ -1,6 +1,7 @@
 using Core.Exceptions;
 using Domain.Constants;
 using Domain.DTOs.Request;
+using Domain.Errors;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using System;
@@ -32,19 +33,20 @@ namespace Core.Validators
             var results = _validator.Validate(register);
             if (!results.IsValid)
             {
-                var errors = new List<int>();
+                var errors = new List<PropertyError>();
                 foreach (var item in results.Errors)
                 {
                     try
                     {
-                        errors.Add(Convert.ToInt32(item.ErrorMessage));
+                        var code = Convert.ToInt32(item.ErrorMessage);
+                        errors.Add(new PropertyError { Code = code, PropertyName = item.PropertyName });
                     }
                     catch
                     {
 
                     }
                 }
-                throw new BusinessException(errors);
+                throw new ArgumentBusinessException(errors);
             }
         }
     }
