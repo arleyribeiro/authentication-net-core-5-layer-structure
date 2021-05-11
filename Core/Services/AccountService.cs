@@ -1,16 +1,17 @@
 using AutoMapper;
+using Core.Exceptions;
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
 using Core.Validators;
 using Domain.Entities;
 using Domain.DTOs.Request;
 using Domain.DTOs.Response;
-using Core.Exceptions;
+using Domain.Constants;
 using Infrastructure.Interfaces.Repositories;
 
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Core.Services
 {
@@ -53,27 +54,10 @@ namespace Core.Services
         private void ValidateRegisterRequest(RegisterRequest register)
         {
             if (register == null)
-                throw new BusinessException("Required register");
-
-            var validator = new RegisterValidator();
-            var results = validator.Validate(register);
-
-            if (!results.IsValid)
             {
-                var errors = new List<int>();
-                foreach (var item in results.Errors)
-                {
-                    try
-                    {
-                        errors.Add(Convert.ToInt32(item.ErrorMessage));
-                    }
-                    catch
-                    {
-
-                    }
-                }
-                throw new BusinessException(errors);
+                throw new BusinessException(ErrorsConstants.REQUIRED_PARAMETER);
             }
+            RegisterValidator.ValidateAndThrowExceptionIfExistError(register);
         }
 
         private async Task<bool> Insert(User user)

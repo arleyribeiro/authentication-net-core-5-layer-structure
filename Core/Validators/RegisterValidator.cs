@@ -1,7 +1,10 @@
-using System;
+using Core.Exceptions;
+using Domain.Constants;
 using Domain.DTOs.Request;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using System;
+using System.Collections.Generic;
 
 namespace Core.Validators
 {
@@ -10,10 +13,39 @@ namespace Core.Validators
         public RegisterValidator()
         {
             RuleFor(x => x.Username)
-                .NotEmpty().WithMessage("1001")
-                .MinimumLength(1).WithMessage("1002");
-            RuleFor(x => x.Password).NotEmpty().MinimumLength(10).MaximumLength(10).WithMessage("Password is required");
-            RuleFor(x => x.Role).NotEmpty().When(m => m.Role?.ToLower() != "manager" || m.Role?.ToLower() != "employee").WithMessage("ROLE: Must be manager or employee");
+                .NotEmpty().WithMessage(ErrorsConstants.REQUIRED_PARAMETER.ToString());
+
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage(ErrorsConstants.REQUIRED_PARAMETER.ToString())
+                .MinimumLength(10).WithMessage(ErrorsConstants.Register.MIN_LENGTH_PASSWORD.ToString())
+                .MaximumLength(10).WithMessage(ErrorsConstants.Register.MAX_LENGTH_PASSWORD.ToString());
+
+            RuleFor(x => x.Role)
+                .NotEmpty().WithMessage(ErrorsConstants.REQUIRED_PARAMETER.ToString())
+                .When(m => m.Role?.ToLower() != "manager" && m.Role?.ToLower() != "employee")
+                .WithMessage(ErrorsConstants.Register.INVALID_ROLE.ToString());
+        }
+
+        public static void ValidateAndThrowExceptionIfExistError(RegisterRequest register)
+        {
+            var _validator = new RegisterValidator();
+            var results = _validator.Validate(register);
+            if (!results.IsValid)
+            {
+                var errors = new List<int>();
+                foreach (var item in results.Errors)
+                {
+                    try
+                    {
+                        errors.Add(Convert.ToInt32(item.ErrorMessage));
+                    }
+                    catch
+                    {
+
+                    }
+                }
+                throw new BusinessException(errors);
+            }
         }
     }
 }
