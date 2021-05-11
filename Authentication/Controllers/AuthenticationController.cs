@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +28,8 @@ namespace Authentication.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest model)
         {
-            return await _accountService.Login(model).ConfigureAwait(false);
+            var result = await _accountService.Login(model).ConfigureAwait(false);
+            return Ok(result);
         }
 
         [HttpPost]
@@ -35,7 +37,8 @@ namespace Authentication.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<bool>> Register([FromBody] RegisterRequest user)
         {
-            return await _accountService.Register(user).ConfigureAwait(false);
+            var result = await _accountService.Register(user).ConfigureAwait(false);
+            return Ok(result);
         }
     }
 }

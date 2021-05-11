@@ -37,7 +37,7 @@ namespace Core.Services
                 var token = _tokenService.GenerateToken(account);
                 return new LoginResponse { Token = token };
             }
-            throw new BusinessException(ErrorsConstants.INVALID_LOGIN);
+            throw new UnauthorizedBusinessException(ErrorsConstants.INVALID_LOGIN);
         }
         public bool Authenticate(string hashedPassword, string password)
         {

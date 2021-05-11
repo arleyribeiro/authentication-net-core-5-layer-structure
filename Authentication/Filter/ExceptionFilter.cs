@@ -51,6 +51,9 @@ namespace Authentication.Filter
                 case BusinessException businessException:
                     return GetResponseFromErrorMessage(businessException.Errors);
 
+                case UnauthorizedBusinessException unauthorizedBusinessException:
+                    return GetResponseFromErrorMessage(unauthorizedBusinessException.Errors, HttpStatusCode.Unauthorized);
+
                 default:
                     return GetResponseFromErrorMessage(MessagesHelper.GetGenericError());
             }
