@@ -40,5 +40,13 @@ namespace Authentication.Controllers
             var result = await _accountService.Register(user).ConfigureAwait(false);
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("test")]
+        [AllowAnonymous]
+        public ActionResult<string> Teste()
+        {
+            return Ok("Hello word");
+        }
     }
 }
